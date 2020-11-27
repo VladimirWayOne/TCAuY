@@ -51,20 +51,60 @@ class MobileRobot:
             self.__isReady = False
             print('Транспортировка ', what, ' из ', from_where, ' до ', to_where)
             for i in tqdm(range(0, 10)):
-                time.sleep(0.1)
+                time.sleep(0.01)
+
+            print('\nПередача завершена')
+
             self.__isReady = True
         else:
             print('Мобильный робот занят')
-    pass
 
 
 class CuttingMachine:
-    """Класс Станка для резки прута"""
+    """Класс Станка для резки прута
+    Приемка происходит при условиях:
+        -в станке нет детали
+        -не осуществляется какой-либо процесс (приемка/резка/выдача)
+
+    Резка происходит при условиях:
+        -процесс приемки закончен
+        -деталь в станке
+
+    Выдача происходит при условиях:
+        -процесс резки закончен"""
+
     def __init__(self):
         self.__isReadyForAccept = True      # готовность приемки
-        self.__isReadyForCutting = True     # готовность резки
+        self.__isReadyForCutting = False     # готовность резки
         self.__isReadyForIssue = False      # готовность выдачи
-        pass
+
+    def Accept(self, detail):
+        """Функция приемки детали"""
+        if self.__isReadyForAccept:
+            print('Приемка ', detail)
+            self.__isReadyForAccept = False
+            self.__isReadyForCutting = True
+        else:
+            print('Станок не готов к приемке')
+
+    def Cutting(self, detail):
+        """Функция резки детали"""
+        if self.__isReadyForCutting:
+            print('Резка ', detail)
+            self.__isReadyForCutting = False
+            self.__isReadyForIssue = True
+        else:
+            print('Станок не готов к резке')
+
+    def Issue(self):
+        """Функция выдачи"""
+        if self.__isReadyForIssue:
+            print('Выдача')
+            self.__isReadyForIssue = False
+            print('Станок пуст и готов к приемке')
+            self.__isReadyForAccept = True
+        else:
+            print('Станок не готов к выдаче')
 
 
 if __name__ == "__main__":
@@ -79,3 +119,4 @@ if __name__ == "__main__":
     tr_rob.transport('деталь', 'прокат', 'резка')
     tr_rob.transport('деталь', 'прокат', 'резка')
     cutmach = CuttingMachine()
+   # help(CuttingMachine())
