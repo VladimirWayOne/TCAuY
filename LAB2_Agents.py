@@ -115,7 +115,7 @@ class StationaryRobot:
         pass
 
     def Load(self, get_msgs):
-        """Функция загрузки с проверкой на наличие детали"""
+        """Функция загрузки деталей с тары на токарный станок"""
         if not get_msgs:       # сообщение о готовности
             print('Тара или станок не готовы')
             return 0
@@ -131,7 +131,7 @@ class StationaryRobot:
             print('Стационарный робот не готов')
 
     def Move(self, get_msgs_tok, get_msgs_frez):
-        """Функция перемещения"""
+        """Функция перемещения деталей с токарного станка на фрезерный"""
         if not get_msgs_tok:       # Проверка сигнала о готовности выдачи с токарного станка
             print('Выдача с токарного станка не готова')
             return 0
@@ -149,9 +149,19 @@ class StationaryRobot:
         else:
             print('Стационарный робот не готов')
 
+    def Removing(self, get_msgs):
+        """Функция снятия деталей с фрезерного станка"""
+        if not get_msgs:           # Проверка готовности фрезерного станка
+            print('Фрезерный станок не готов к выдаче')
+            return 0
 
-
-
+        if self.__isReady:
+            self.__isReady = False
+            print("Захват детали с фрезерного станка")
+            print("Перемещение детали в тару")
+            self.__isReady = True
+        else:
+            print('Стационарный робот не готов')
 
 
 if __name__ == "__main__":
