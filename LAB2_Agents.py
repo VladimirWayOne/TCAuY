@@ -202,10 +202,42 @@ class Machine:
 
     def Issue(self):
         """Выдача готовых деталей"""
-        if self.isReadyToIssue:     # проверка на готовность к выдаче
+        if self.isReadyToIssue:     # Проверка на готовность к выдаче
             print("Выдача")
         else:
             print('Станок не готов к выдаче')
+
+
+class Container:
+    """Тара для заготовок и готовых изделий"""
+    def __init__(self, maximum=10):
+        self.maximum = maximum      # Максимальное количество содержимого в таре (по умолчанию 10)
+        self.isReadyToAccept = False
+        self.__isReadyToTransport = False
+        self.content = []
+        pass
+
+    def __isFull(self):
+        """Приватный метод класса для проверки заполненности тары"""
+        if len(self.content) == self.maximum:
+            return True
+        else:
+            return False
+
+    def Accept(self, detail):
+        """Прием промежуточных заготовок и готовых деталей"""
+        if self.__isFull():
+            print('Тара переполненна')
+            self.isReadyToAccept = False
+        else:
+            if self.isReadyToAccept:
+                self.isReadyToAccept = False
+                print("В процессе загрузки")
+                self.content.append(detail)
+                print('В таре, ', len(self.content), ' деталей')  # Заполненность
+                self.__isReadyToTransport = True
+                print("Готово к транспортировке")
+
 
 if __name__ == "__main__":
     robot = Agent('Жора')
