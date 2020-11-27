@@ -215,11 +215,20 @@ class Container:
         self.isReadyToAccept = False
         self.__isReadyToTransport = False
         self.content = []
+        self.isReadyToIssue = False
         pass
 
     def __isFull(self):
         """Приватный метод класса для проверки заполненности тары"""
         if len(self.content) == self.maximum:
+            self.isReadyToIssue = True
+            return True
+        else:
+            return False
+
+    def __isEmpty(self):
+        if len(self.content) == 0:
+            self.isReadyToIssue = False
             return True
         else:
             return False
@@ -237,6 +246,31 @@ class Container:
                 print('В таре, ', len(self.content), ' деталей')  # Заполненность
                 self.__isReadyToTransport = True
                 print("Готово к транспортировке")
+                self.isReadyToIssue = True
+
+            else:
+                print("Тара не готова к приемке")
+
+    def Transporting(self):
+        """Перемещение тары посредством Мобильного робота"""
+        print('Запрос к транспортировке')
+
+    def Issue(self, detail):
+        """Выдача прутков на последующую обработку"""
+        if self.__isEmpty():        # Проверка на пустоту
+            print('Тара пуста')
+            return 0
+
+        if self.isReadyToIssue:     # Проверка на готовность к выдаче
+            if detail in self.content:
+                print('Выдача')
+                if self.__isEmpty(): # Сообщение об опустошении
+                    print('Тара пуста')
+            else:
+                print('Данной детали нет')
+        else:
+            print("Тара не готова к выдаче")
+
 
 
 if __name__ == "__main__":
