@@ -164,6 +164,49 @@ class StationaryRobot:
             print('Стационарный робот не готов')
 
 
+class Machine:
+    """Класс токарного/фрезерного станков"""
+    def __init__(self):
+        self.isReadyToAccept = True
+        self.__isReady = True
+        self.isReadyToMove = False
+        self.isReadyToIssue = False
+        pass
+
+    def Accept(self):
+        if not self.isReadyToAccept:
+            print("Станок не готов к приемке")
+            return 0
+        else:
+            if self.__isReady:
+                self.__isReady = False
+                print("Установка на станок")
+                self.__isReady = True
+            else:
+                print("Станок не готов")
+
+    def Processing(self):
+        """Обработка на токарном/фрезерном станке"""
+        if self.__isReady:
+            self.__isReady = False
+            print("Обработка")
+            print("Конец обработки")
+            self.__isReady = True
+            self.isReadyToIssue = True
+        else:
+            print("Станок не готов")
+
+    def Move(self):
+        """Отправка запроса на перемещение"""
+        self.isReadyToMove = True
+
+    def Issue(self):
+        """Выдача готовых деталей"""
+        if self.isReadyToIssue:     # проверка на готовность к выдаче
+            print("Выдача")
+        else:
+            print('Станок не готов к выдаче')
+
 if __name__ == "__main__":
     robot = Agent('Жора')
     sklad = Storage(2)
