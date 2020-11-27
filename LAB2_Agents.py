@@ -227,6 +227,7 @@ class Container:
             return False
 
     def __isEmpty(self):
+        """Приватный метод класса для опустошенности заполненности тары"""
         if len(self.content) == 0:
             self.isReadyToIssue = False
             return True
@@ -251,7 +252,8 @@ class Container:
             else:
                 print("Тара не готова к приемке")
 
-    def Transporting(self):
+    @staticmethod
+    def Transporting():
         """Перемещение тары посредством Мобильного робота"""
         print('Запрос к транспортировке')
 
@@ -261,10 +263,10 @@ class Container:
             print('Тара пуста')
             return 0
 
-        if self.isReadyToIssue:     # Проверка на готовность к выдаче
+        if self.isReadyToIssue:          # Проверка на готовность к выдаче
             if detail in self.content:
                 print('Выдача')
-                if self.__isEmpty(): # Сообщение об опустошении
+                if self.__isEmpty():    # Сообщение об опустошении
                     print('Тара пуста')
             else:
                 print('Данной детали нет')
