@@ -107,6 +107,32 @@ class CuttingMachine:
             print('Станок не готов к выдаче')
 
 
+class StationaryRobot:
+    def __init__(self, detail=None):
+        self.detail = detail
+        self.__isReady = True
+        pass
+
+    def Load(self, get_msgs):
+        """Функция загрузки с проверкой на наличие детали"""
+        if get_msgs == False:       # сообщение о готовности
+            print('Тара или станок не готовы')
+            return 0
+        if self.__isReady:
+            if self.detail is not None:
+                print('Захват детали')
+                self.__isReady = False
+                print('Деталь установлена')
+            else:
+                print('Нет детали')
+        else:
+            print('Стационарный робот не готов')
+
+    def Move(self, get_msgs):
+
+
+
+
 if __name__ == "__main__":
     robot = Agent('Жора')
     sklad = Storage(2)
@@ -119,4 +145,7 @@ if __name__ == "__main__":
     tr_rob.transport('деталь', 'прокат', 'резка')
     tr_rob.transport('деталь', 'прокат', 'резка')
     cutmach = CuttingMachine()
+    statrob = StationaryRobot('деталь')
+    statrob.Load(False or True)
+    statrob.Load(True)
    # help(CuttingMachine())
