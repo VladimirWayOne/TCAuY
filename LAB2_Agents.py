@@ -43,8 +43,7 @@ class Storage:
 class MobileRobot:
     """Класс мобильного робота"""
     def __init__(self):
-        pass
-    __isReady = True    # готовность работы
+        self.__isReady = True    # готовность работы
 
     def transport(self, what, from_where, to_where):
         """Транспортировка"""
@@ -59,9 +58,18 @@ class MobileRobot:
     pass
 
 
+class CuttingMachine:
+    """Класс Станка для резки прута"""
+    def __init__(self):
+        self.__isReadyForAccept = True      # готовность приемки
+        self.__isReadyForCutting = True     # готовность резки
+        self.__isReadyForIssue = False      # готовность выдачи
+        pass
+
+
 if __name__ == "__main__":
     robot = Agent('Жора')
-    sklad = Storage(10)
+    sklad = Storage(2)
     sklad.Accept('всякой хуйни')
     sklad.Accept('всякой хуйни_2')
     sklad.Accept('всякой хуйни_3')
@@ -70,3 +78,4 @@ if __name__ == "__main__":
     tr_rob = MobileRobot()
     tr_rob.transport('деталь', 'прокат', 'резка')
     tr_rob.transport('деталь', 'прокат', 'резка')
+    cutmach = CuttingMachine()
