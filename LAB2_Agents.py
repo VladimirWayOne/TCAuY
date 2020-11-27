@@ -1,7 +1,11 @@
+import time
+from tqdm import tqdm
+
+
 class Agent:
     """Единый класс Агента"""
     def __init__(self, name):
-        print('Агент ' + name +' готов')
+        print('Агент ' + name + ' готов')
 
 
 class Storage:
@@ -37,6 +41,21 @@ class Storage:
 
 
 class MobileRobot:
+    """Класс мобильного робота"""
+    def __init__(self):
+        pass
+    __isReady = True    # готовность работы
+
+    def transport(self, what, from_where, to_where):
+        """Транспортировка"""
+        if self.__isReady:      # проверка на готовность
+            self.__isReady = False
+            print('Транспортировка ', what, ' из ', from_where, ' до ', to_where)
+            for i in tqdm(range(0, 10)):
+                time.sleep(0.1)
+            self.__isReady = True
+        else:
+            print('Мобильный робот занят')
     pass
 
 
@@ -48,4 +67,6 @@ if __name__ == "__main__":
     sklad.Accept('всякой хуйни_3')
     sklad.Issue('всякой хуйни_3')
     sklad.Issue('всякой хуйни')
-    # help(Storage.Issue)
+    tr_rob = MobileRobot()
+    tr_rob.transport('деталь', 'прокат', 'резка')
+    tr_rob.transport('деталь', 'прокат', 'резка')
