@@ -108,6 +108,7 @@ class CuttingMachine:
 
 
 class StationaryRobot:
+    """Класс стационарного робота"""
     def __init__(self, detail=None):
         self.detail = detail
         self.__isReady = True
@@ -115,7 +116,7 @@ class StationaryRobot:
 
     def Load(self, get_msgs):
         """Функция загрузки с проверкой на наличие детали"""
-        if get_msgs == False:       # сообщение о готовности
+        if not get_msgs:       # сообщение о готовности
             print('Тара или станок не готовы')
             return 0
         if self.__isReady:
@@ -123,12 +124,32 @@ class StationaryRobot:
                 print('Захват детали')
                 self.__isReady = False
                 print('Деталь установлена')
+                self.__isReady = True
             else:
                 print('Нет детали')
         else:
             print('Стационарный робот не готов')
 
-    def Move(self, get_msgs):
+    def Move(self, get_msgs_tok, get_msgs_frez):
+        """Функция перемещения"""
+        if not get_msgs_tok:       # Проверка сигнала о готовности выдачи с токарного станка
+            print('Выдача с токарного станка не готова')
+            return 0
+
+        if not get_msgs_frez:      # Проверка сигнала о готовности выдачи с токарного станка
+            print('Фрезерный станок не готов к приемке')
+            return 0
+
+        if self.__isReady:
+            self.__isReady = False
+            print('Захват детали с фрезерного станка')
+            print('Установка детали на фрезерный станок')
+            print('Деталь установлена')
+            self.__isReady = True
+        else:
+            print('Стационарный робот не готов')
+
+
 
 
 
