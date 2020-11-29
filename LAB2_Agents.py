@@ -13,7 +13,7 @@ class Storage:
     """Класс Склада"""
     def __init__(self, maximum_things=10):
         self.maximum = maximum_things       # размер хранилища
-        # print('Допустимая нагружемость: ', self.maximum)
+        # print('Склад: Допустимая нагружемость: ', self.maximum)
 
     _current = 0
     _storage = []
@@ -25,7 +25,7 @@ class Storage:
         if self._current < self.maximum:
             self._current += 1
             self._storage.append(thing)
-            print('Процесс приемки ', thing)
+            print('Склад: Процесс приемки ', thing)
         else:
             print('Склад переполнен')
 
@@ -52,7 +52,7 @@ class MobileRobot:
         """Транспортировка"""
         if self.__isReady:      # проверка на готовность
             self.__isReady = False
-            print('Транспортировка ', what, ' из ', from_where, ' до ', to_where)
+            print('Мобильный робот: Транспортировка ', what, ' из ', from_where, ' до ', to_where)
             for i in tqdm(range(0, 10)):
                 time.sleep(0.01)
 
@@ -85,11 +85,11 @@ class CuttingMachine:
     def Accept(self, detail):
         """Функция приемки детали"""
         if self.__isReadyForAccept:
-            print('Приемка ', detail)
+            print('Станок для резки: Приемка ', detail)
             self.__isReadyForAccept = False
             self.__isReadyForCutting = True
         else:
-            print('Станок не готов к приемке')
+            print('Станок для резки: Станок не готов к приемке')
 
     def Cutting(self, detail):
         """Функция резки детали"""
@@ -98,18 +98,18 @@ class CuttingMachine:
             self.__isReadyForCutting = False
             self.__isReadyForIssue = True
         else:
-            print('Станок не готов к резке')
+            print('Станок для резки: Станок не готов к резке')
 
     def Issue(self, detail):
         """Функция выдачи"""
         if self.__isReadyForIssue:
             print('Выдача', detail)
             self.__isReadyForIssue = False
-            print('Станок пуст и готов к приемке')
+            print('Станок для резки: Станок пуст и готов к приемке')
             self.__isReadyForAccept = True
             # return detail
         else:
-            print('Станок не готов к выдаче')
+            print('Станок для резки: Станок не готов к выдаче')
 
 
 class StationaryRobot:
@@ -128,10 +128,10 @@ class StationaryRobot:
             if self.detail is not None:
                 print('Захват детали')
                 self.__isReady = False
-                print('Деталь установлена')
+                print('Стационарный робот: Деталь установлена')
                 self.__isReady = True
             else:
-                print('Нет детали')
+                print('Стационарный робот: Нет детали')
         else:
             print('Стационарный робот не готов')
 
