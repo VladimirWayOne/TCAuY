@@ -119,16 +119,16 @@ class StationaryRobot:
         self.__isReady = True
         pass
 
-    def Load(self, get_msgs):
+    def Load(self, detail):
         """Функция загрузки деталей с тары на токарный станок"""
-        if not get_msgs:       # сообщение о готовности
+        if detail is None:       # сообщение о готовности
             print('Тара или станок не готовы')
             return 0
         if self.__isReady:
             if self.detail is not None:
-                print('Захват детали')
+                print('Захват', detail)
                 self.__isReady = False
-                print('Стационарный робот: Деталь установлена')
+                print('Стационарный робот: %s установлена' % detail)
                 self.__isReady = True
             else:
                 print('Стационарный робот: Нет детали')
@@ -147,9 +147,9 @@ class StationaryRobot:
 
         if self.__isReady:
             self.__isReady = False
-            print('Захват детали с фрезерного станка')
-            print('Установка детали на фрезерный станок')
-            print('Деталь установлена')
+           # print('Захват детали с фрезерного станка')
+            #print('Установка детали на токарный станок')
+            #print('Деталь установлена')
             self.__isReady = True
         else:
             print('Стационарный робот не готов')
@@ -162,8 +162,8 @@ class StationaryRobot:
 
         if self.__isReady:
             self.__isReady = False
-            print("Захват детали с фрезерного станка")
-            print("Перемещение детали в тару")
+           # print("Захват детали с фрезерного станка")
+        # print("Перемещение детали в тару")
             self.__isReady = True
         else:
             print('Стационарный робот не готов')
@@ -190,8 +190,8 @@ class Machine:
             else:
                 print("Станок не готов")
 
-    def Processing(self):
-        """Обработка на токарном/фрезерном станке"""
+    def ProcessingTok(self):
+        """Обработка на токарном станке"""
         if self.__isReady:
             self.__isReady = False
             print("Обработка")
@@ -199,7 +199,18 @@ class Machine:
             self.__isReady = True
             self.isReadyToIssue = True
         else:
-            print("Станок не готов")
+            print("Токарный станок не готов")
+
+    def ProcessingFrez(self):
+        """Обработка на фрезерном станке"""
+        if self.__isReady:
+            self.__isReady = False
+            print("Фрезеровка")
+            print("Конец фрезеровки")
+            self.__isReady = True
+            self.isReadyToIssue = True
+        else:
+            print("Фрезерный станок не готов")
 
     def Move(self):
         """Отправка запроса на перемещение"""
@@ -215,12 +226,13 @@ class Machine:
 
 class Container:
     """Тара для заготовок и готовых изделий"""
-    def __init__(self, maximum=10):
+    def __init__(self, maximum=10, name='Тара_1'):
         self.maximum = maximum      # Максимальное количество содержимого в таре (по умолчанию 10)
         self.isReadyToAccept = True
         self.__isReadyToTransport = False
         self.content = []
         self.isReadyToIssue = False
+        self.name = name
         pass
 
     def __isFull(self):
@@ -250,7 +262,7 @@ class Container:
                 self.isReadyToAccept = False
                 print("В процессе загрузки")
                 self.content.append(detail)
-                print('В таре, ', len(self.content), ' деталей')  # Заполненность
+                print('В', self.name, len(self.content), 'деталей')  # Заполненность
                 self.__isReadyToTransport = True
                 print("Готово к транспортировке")
                 self.isReadyToIssue = True
@@ -261,7 +273,7 @@ class Container:
     def Transporting(self):
         """Перемещение тары посредством Мобильного робота"""
         if self.__isReadyToTransport:
-        	print("К транспортировке готово")
+            print("К транспортировке готово")
 
     def Issue(self, detail):
         """Выдача прутков на последующую обработку"""
@@ -319,11 +331,16 @@ class Server:
     def P6(self, detail):       # Готовность выдачи
         self.CuttingMachine.Issue(detail)
 
-    def P7(self):               # Готовность приема ТОК_ФРЕЗ
-        self.Machine.Accept()
+    def P7(self, detail):               # Готовность приема ТОК_ФРЕЗ
+        self.Machine.Accept(detail)
 
-    def P8(self):               # Обработка ТОК_ФРЕЗ
-        self.Machine.Processing()
+    def P8(self, machine):               # Обработка ТОК_ФРЕЗ
+        if machine == 'фрез':
+            self.Machine.ProcessingFrez()
+        elif machine == 'ток':
+            self.Machine.ProcessingTok()
+        else:
+            print("Такого станка нет")
 
     def P9(self):               # Отправка запроса на перемещение
         self.Machine.Move()
@@ -332,8 +349,8 @@ class Server:
     def P10(self):              # Готовность выдачи ТОК_ФРЕЗ
         self.Machine.Issue()
 
-    def P11(self):              # Прием сигнала о готовности тары и станка
-        self.StationaryRobot.Load(True)
+    def P11(self, detail):              # Прием сигнала о готовности тары и станка
+        self.StationaryRobot.Load(detail)
 
     def P12(self):              # Прием сигнала о готовности выдачи с токарного станка
         self.StationaryRobot.Move(True, True)
@@ -351,8 +368,9 @@ class Server:
     def P16(self, detail):                      # Выдача из контейнера
         self.Container.Issue(detail)
 
+    """
     def StartProcCycle(self, detail):       # рабочий цикл для одной детали
-        """Полный цикл обработки"""
+        ""Полный цикл обработки""
         self.P4(detail)
         self.P5(detail)
         self.P6(detail)
@@ -360,13 +378,40 @@ class Server:
         self.P15(detail, 'Станок для резки', 'Токарно-фрезерные станки')
         self.P16(detail)
         pass
+    """
 
+    def CuttingProcCycle(self, detail):
+        """Цикл резки"""
+        self.P4(detail)
+        self.P5(detail)
+        self.P6(detail)
+        self.P14(detail)
 
+    def TransportingProcCycle(self, container, from_where, to_where):
+        """Рабочий цикл перевозки тары"""
+        self.P15(container, from_where, to_where)
+
+    def ProcessingProcCycle(self, detail):
+        """Рабочий цикл обработки деталей"""
+        self.P16(detail)
+
+        self.P11(detail)
+        self.P7(detail)
+        self.P8('фрез')
+        self.P9()
+        self.P10()
+        self.P12()
+        self.P7(detail)
+        self.P8('ток')
+        self.P9()
+        self.P10()
+        self.P13()
+        self.P14(detail)
 
 
 if __name__ == "__main__":
-    Agents = [Agent('деталь1'), Agent("деталь2")]
-    details = ['det1', 'det2', 'det3']
+    Agents = [Agent('деталь_1'), Agent("деталь_2"), Agent('Деталь_3')]
+    # details = ['det1', 'det2', 'det3']
     agent = Agent('test')
     storage = Storage()
     mobilerobot = MobileRobot()
@@ -375,26 +420,14 @@ if __name__ == "__main__":
     machine = Machine()
     contain = Container()
     server = Server(agent, storage, mobilerobot, cuttingmachine, statrobot, machine, contain)
-    for det in details:
-        server.StartProcCycle(det)
-    """
-    #server = Server()
-    robot = Agent('Жора')
-   # print(robot.name)
-    server = Server(robot)
-   # print(server.Agent.name)
-    sklad = Storage(2)
-    sklad.Accept('всякой хуйни')
-    sklad.Accept('всякой хуйни_2')
-    sklad.Accept('всякой хуйни_3')
-    sklad.Issue('всякой хуйни_3')
-    sklad.Issue('всякой хуйни')
-    tr_rob = MobileRobot()
-    tr_rob.transport('деталь', 'прокат', 'резка')
-    tr_rob.transport('деталь', 'прокат', 'резка')
-    cutmach = CuttingMachine()
-    statrob = StationaryRobot('деталь')
-    statrob.Load(False or True)
-    statrob.Load(True)
-   # help(CuttingMachine())
-   """
+    for ag in Agents:
+        server.CuttingProcCycle(ag.name)
+
+    server.TransportingProcCycle(server.Container.name, 'Отрезной станок', 'ТОК_ФРЕЗ станки')
+
+    print(server.Container.content)
+    copy_cont = server.Container.content.copy()
+    for det in copy_cont:
+        server.ProcessingProcCycle(det)
+
+    server.TransportingProcCycle(server.Container.name, 'ТОК_ФРЕЗ станки', 'Цех сборки')
