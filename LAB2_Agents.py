@@ -296,7 +296,7 @@ class Container:
 
 class Server:
     """
-    Сервер, с помощью которого производиться управление системой
+    Сервер, с помощью которого производится управление системой
     """
     def __init__(self, Agent, Storage, MobileRobot, CuttingMachine, StationaryRobot, Machine, Container):
         self.Agent = Agent
