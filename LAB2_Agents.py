@@ -178,14 +178,14 @@ class Machine:
         self.isReadyToIssue = False
         pass
 
-    def Accept(self):
+    def Accept(self, detail):
         if not self.isReadyToAccept:
             print("Станок не готов к приемке")
             return 0
         else:
             if self.__isReady:
                 self.__isReady = False
-                print("Установка на станок")
+                print("Установка ", detail, " на станок")
                 self.__isReady = True
             else:
                 print("Станок не готов")
@@ -232,7 +232,7 @@ class Container:
             return False
 
     def __isEmpty(self):
-        """Приватный метод класса для опустошенности заполненности тары"""
+        """Приватный метод класса для опустошенности тары"""
         if len(self.content) == 0:
             self.isReadyToIssue = False
             self.isReadyToAccept = True
@@ -247,14 +247,14 @@ class Container:
             self.isReadyToAccept = False
         else:
             if self.isReadyToAccept:
-                #self.isReadyToAccept = False
+                self.isReadyToAccept = False
                 print("В процессе загрузки")
                 self.content.append(detail)
                 print('В таре, ', len(self.content), ' деталей')  # Заполненность
                 self.__isReadyToTransport = True
                 print("Готово к транспортировке")
                 self.isReadyToIssue = True
-
+                self.isReadyToAccept = True
             else:
                 print("Тара не готова к приемке")
 
@@ -273,7 +273,7 @@ class Container:
             if detail in self.content:
                 print('Выдача')
                 self.content.remove(detail)
-                self.isReadyToAccept == True
+                self.isReadyToAccept = True
                 if self.__isEmpty():    # Сообщение об опустошении
                     print('Тара пуста')
             else:
@@ -284,8 +284,7 @@ class Container:
 
 class Server:
     """
-    TODO Сделать сервер, содержащий все маркеры готовности агентов
-    попозже
+    Сервер, с помощью которого производиться управление системой
     """
     def __init__(self, Agent, Storage, MobileRobot, CuttingMachine, StationaryRobot, Machine, Container):
         self.Agent = Agent
@@ -302,56 +301,58 @@ class Server:
         else:
             print('Error!')
 
-    def P2(self, detail):
+    def P2(self, detail):   # Готовность выдачи
         if self.Storage.isReadyToIssue:
             return self.Storage.Issue(detail)
         else:
             print('Error!')
 
-    def P3(self, what, from_where, to_where):
+    def P3(self, what, from_where, to_where):   # Готовность транспортировки
         self.MobileRobot(what, from_where, to_where)
 
-    def P4(self, detail):
+    def P4(self, detail):       # Готовность приемa
         self.CuttingMachine.Accept(detail)
 
-    def P5(self, detail):
+    def P5(self, detail):       # Готовность резки прутка
         self.CuttingMachine.Cutting(detail)
 
-    def P6(self, detail):
+    def P6(self, detail):       # Готовность выдачи
         self.CuttingMachine.Issue(detail)
 
-    def P7(self):
+    def P7(self):               # Готовность приема ТОК_ФРЕЗ
         self.Machine.Accept()
 
-    def P8(self):
+    def P8(self):               # Обработка ТОК_ФРЕЗ
         self.Machine.Processing()
 
-    def P9(self):
+    def P9(self):               # Отправка запроса на перемещение
         self.Machine.Move()
+        self.P12()
 
-    def P10(self):
+    def P10(self):              # Готовность выдачи ТОК_ФРЕЗ
         self.Machine.Issue()
 
-    def P11(self):
+    def P11(self):              # Прием сигнала о готовности тары и станка
         self.StationaryRobot.Load(True)
 
-    def P12(self):
+    def P12(self):              # Прием сигнала о готовности выдачи с токарного станка
         self.StationaryRobot.Move(True, True)
 
-    def P13(self):
+    def P13(self):              # Прием сигнала с фрезерного станка о готовности выдачи
         self.StationaryRobot.Removing(True)
 
-    def P14(self, detail):
+    def P14(self, detail):      # Загрузить в тару
         self.Container.Accept(detail)
 
-    def P15(self,  what, from_where, to_where):
+    def P15(self,  what, from_where, to_where): # Транспортировка
         self.Container.Transporting()
         self.MobileRobot.transport(what, from_where, to_where)
 
-    def P16(self, detail):
+    def P16(self, detail):                      # Выдача из контейнера
         self.Container.Issue(detail)
 
     def StartProcCycle(self, detail):       # рабочий цикл для одной детали
+        """Полный цикл обработки"""
         self.P4(detail)
         self.P5(detail)
         self.P6(detail)
@@ -361,7 +362,10 @@ class Server:
         pass
 
 
+
+
 if __name__ == "__main__":
+    Agents = [Agent('деталь1'), Agent("деталь2")]
     details = ['det1', 'det2', 'det3']
     agent = Agent('test')
     storage = Storage()
