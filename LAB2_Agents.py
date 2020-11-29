@@ -235,6 +235,7 @@ class Container:
         """Приватный метод класса для опустошенности заполненности тары"""
         if len(self.content) == 0:
             self.isReadyToIssue = False
+            self.isReadyToAccept = True
             return True
         else:
             return False
@@ -246,7 +247,7 @@ class Container:
             self.isReadyToAccept = False
         else:
             if self.isReadyToAccept:
-                self.isReadyToAccept = False
+                #self.isReadyToAccept = False
                 print("В процессе загрузки")
                 self.content.append(detail)
                 print('В таре, ', len(self.content), ' деталей')  # Заполненность
@@ -257,10 +258,10 @@ class Container:
             else:
                 print("Тара не готова к приемке")
 
-    @staticmethod
-    def Transporting():
+    def Transporting(self):
         """Перемещение тары посредством Мобильного робота"""
-        print('Запрос к транспортировке')
+        if self.__isReadyToTransport:
+        	print("К транспортировке готово")
 
     def Issue(self, detail):
         """Выдача прутков на последующую обработку"""
@@ -271,6 +272,8 @@ class Container:
         if self.isReadyToIssue:          # Проверка на готовность к выдаче
             if detail in self.content:
                 print('Выдача')
+                self.content.remove(detail)
+                self.isReadyToAccept == True
                 if self.__isEmpty():    # Сообщение об опустошении
                     print('Тара пуста')
             else:
@@ -343,7 +346,7 @@ class Server:
 
     def P15(self,  what, from_where, to_where):
         self.Container.Transporting()
-        self.MobileRobot(what, from_where, to_where)
+        self.MobileRobot.transport(what, from_where, to_where)
 
     def P16(self, detail):
         self.Container.Issue(detail)
