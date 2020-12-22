@@ -1,0 +1,58 @@
+import turtle, time
+
+screen = turtle.Screen()
+
+shapes = []
+robot = r"D:\ITMO\ТСАиУ\lab2\mr_free.gif"
+robot_busy = r"D:\ITMO\ТСАиУ\lab2\mr_busy.gif"
+cut_busy = r"D:\ITMO\ТСАиУ\lab2\cut_busy.gif"
+cut_free = r"D:\ITMO\ТСАиУ\lab2\cut_free.gif"
+stat_r_l = r"D:\ITMO\ТСАиУ\lab2\stat_rob_l.gif"
+stat_r_r = r"D:\ITMO\ТСАиУ\lab2\stat_rob_r.gif"
+tok_busy = r"D:\ITMO\ТСАиУ\lab2\tok_busy.gif"
+tok_free = r"D:\ITMO\ТСАиУ\lab2\tok_free.gif"
+frez_busy = r"D:\ITMO\ТСАиУ\lab2\frez_busy.gif"
+frez_free = r"D:\ITMO\ТСАиУ\lab2\frez_free.gif"
+
+
+class new_turtle:
+    def __init__(self, x, y, image):
+
+        self.turtle = turtle.Turtle()
+        try:
+            self.turtle.shape(image)
+        except:
+            screen.addshape(image)
+            self.turtle.shape(image)
+            print("new shape added: {}".format(image))
+
+        self.turtle.penup()
+        self.turtle.setx(x)
+        self.turtle.sety(y)
+
+    def change_shape(self, new_shape):
+        global shapes
+        try:
+            self.turtle.shape(new_shape)
+        except:
+            if new_shape not in shapes:
+                shapes.append(new_shape)
+                screen.addshape(new_shape)
+                self.turtle.shape(new_shape)
+                print("new shape added: {}".format(new_shape))
+
+
+if __name__ == "__main__":
+    my_t2 = new_turtle(-20, -20, cut_free)
+    time.sleep(1)
+    my_t = new_turtle(10, 100, robot)
+    my_t.turtle.speed("slowest")
+    my_t.change_shape(robot_busy)
+    my_t.turtle.forward(0)
+    my_t.turtle.goto(my_t2.turtle.xcor(), my_t2.turtle.ycor())
+    my_t2.change_shape(cut_busy)
+    time.sleep(5)
+    my_t2.change_shape(cut_free)
+    my_t.turtle.goto(10, 100)
+    my_t.change_shape(robot)
+    turtle.mainloop()
