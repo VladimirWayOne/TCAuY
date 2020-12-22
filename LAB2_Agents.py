@@ -10,7 +10,6 @@ from threading import Thread
 class addThread(Thread):
     def __init__(self, name, target):
         Thread.__init__(self, target=target)
-
         self.name = name
 
     def start_thread(self):
@@ -66,7 +65,9 @@ class MobileRobot:
         self.__isReady = True    # готовность работы
         self.mr_x = 200
         self.mr_y = 200
+        self.turtle2 = moving.new_turtle(self.mr_x, self.mr_y, "circle")
         self.turtle = moving.new_turtle(self.mr_x, self.mr_y, moving.robot)
+
 
     def transport(self, what, from_where, to_where):
         """Транспортировка"""
@@ -75,13 +76,37 @@ class MobileRobot:
             print('Мобильный робот: Транспортировка ', what, ' из ', from_where, ' до ', to_where)
             self.turtle.change_shape(moving.robot_busy)
             if to_where == 'Отрезной станок':
-                self.turtle.turtle.goto(-200, -200)
+                thr1 = Thread(target=self.turtle.turtle.goto(-200, -200))
+                thr1.daemon = True
+                #time.sleep(0.05)
+                thr2 = Thread(target=self.turtle2.turtle.goto(-200, -200))
+                thr2.daemon = True
+                thr1.start()
+                thr2.start()
             elif to_where == 'ТОК_ФРЕЗ станки':
-                self.turtle.turtle.goto(200, -200)
+                thr1 = Thread(target=self.turtle.turtle.goto(200, -200))
+                thr1.daemon = True
+                #time.sleep(0.01)
+                thr2 = Thread(target=self.turtle2.turtle.goto(200, -200))
+                thr2.daemon = True
+                thr1.start()
+                thr2.start()
             elif to_where == 'Цех сборки':
-                self.turtle.turtle.goto(200, 200)
+                thr1 = Thread(target=self.turtle.turtle.goto(200, 200))
+                thr1.daemon = True
+                #time.sleep(0.01)
+                thr2 = Thread(target=self.turtle2.turtle.goto(200, 200))
+                thr2.daemon = True
+                thr1.start()
+                thr2.start()
             elif to_where == '':
-                self.turtle.turtle.goto(0, 0)
+                thr1 = Thread(target=self.turtle.turtle.goto(0, 0))
+                thr1.daemon = True
+                #time.sleep(0.01)
+                thr2 = Thread(target=self.turtle2.turtle.goto(0, 0))
+                thr2.daemon = True
+                thr1.start()
+                thr2.start()
 
             for i in tqdm(range(0, 10)):
                 time.sleep(0.01)
@@ -480,7 +505,7 @@ if __name__ == "__main__":
         server.CuttingProcCycle(ag.name)
 
     server.TransportingProcCycle(server.Container.name, 'Отрезной станок', 'ТОК_ФРЕЗ станки')
-    mobilerobot.turtle.turtle.goto(cuttingmachine.cm_x, cuttingmachine.cm_x)
+
 
     print(server.Container.content)
     copy_cont = server.Container.content.copy()
