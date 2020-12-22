@@ -3,16 +3,16 @@ import turtle, time
 screen = turtle.Screen()
 
 shapes = []
-robot = r"D:\ITMO\ТСАиУ\lab2\pictures\mr_free.gif"
-robot_busy = r"D:\ITMO\ТСАиУ\lab2\pictures\mr_busy.gif"
-cut_busy = r"D:\ITMO\ТСАиУ\lab2\pictures\cut_busy.gif"
-cut_free = r"D:\ITMO\ТСАиУ\lab2\pictures\cut_free.gif"
-stat_r_l = r"D:\ITMO\ТСАиУ\lab2\pictures\stat_rob_l.gif"
-stat_r_r = r"D:\ITMO\ТСАиУ\lab2\pictures\stat_rob_r.gif"
-tok_busy = r"D:\ITMO\ТСАиУ\lab2\pictures\tok_busy.gif"
-tok_free = r"D:\ITMO\ТСАиУ\lab2\pictures\tok_free.gif"
-frez_busy = r"D:\ITMO\ТСАиУ\lab2\pictures\frez_busy.gif"
-frez_free = r"D:\ITMO\ТСАиУ\lab2\pictures\frez_free.gif"
+robot = r"pictures\mr_free.gif"
+robot_busy = r"pictures\mr_busy.gif"
+cut_busy = r"pictures\cut_busy.gif"
+cut_free = r"pictures\cut_free.gif"
+stat_r_l = r"pictures\stat_rob_l.gif"
+stat_r_r = r"pictures\stat_rob_r.gif"
+tok_busy = r"pictures\tok_busy.gif"
+tok_free = r"pictures\tok_free.gif"
+frez_busy = r"pictures\frez_busy.gif"
+frez_free = r"pictures\frez_free.gif"
 
 
 class new_turtle:
