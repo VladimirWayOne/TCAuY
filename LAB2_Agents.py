@@ -1,6 +1,8 @@
 import time
 from tqdm import tqdm
 
+import moving, turtle
+
 
 class Agent:
     """Единый класс Агента"""
@@ -14,7 +16,9 @@ class Storage:
     def __init__(self, maximum_things=10):
         self.maximum = maximum_things       # размер хранилища
         # print('Склад: Допустимая нагружемость: ', self.maximum)
-
+        self.storage_x = 200
+        self.storage_y = 200
+        self.turtle = moving.new_turtle(self.storage_x, self.storage_y, "square")
     _current = 0
     _storage = []
 
@@ -47,6 +51,9 @@ class MobileRobot:
     """Класс мобильного робота"""
     def __init__(self):
         self.__isReady = True    # готовность работы
+        self.mr_x = 200
+        self.mr_y = 200
+        self.turtle = moving.new_turtle(self.mr_x, self.mr_y, moving.robot)
 
     def transport(self, what, from_where, to_where):
         """Транспортировка"""
@@ -77,6 +84,9 @@ class CuttingMachine:
         -процесс резки закончен"""
 
     def __init__(self):
+        self.cm_x = -200
+        self.cm_y = -200
+        self.turtle = moving.new_turtle(self.cm_x, self.cm_y, moving.cut_free)
         self.__isReadyForAccept = True      # готовность приемки
         self.__isReadyForCutting = False     # готовность резки
         self.__isReadyForIssue = False      # готовность выдачи
@@ -94,7 +104,9 @@ class CuttingMachine:
     def Cutting(self, detail):
         """Функция резки детали"""
         if self.__isReadyForCutting:
+            self.turtle.change_shape(moving.cut_busy)
             print('Резка ', detail)
+            time.sleep(1)
             self.__isReadyForCutting = False
             self.__isReadyForIssue = True
         else:
@@ -105,6 +117,7 @@ class CuttingMachine:
         if self.__isReadyForIssue:
             print('Выдача', detail)
             self.__isReadyForIssue = False
+            self.turtle.change_shape(moving.cut_free)
             print('Станок для резки: Станок пуст и готов к приемке')
             self.__isReadyForAccept = True
             # return detail
@@ -115,6 +128,9 @@ class CuttingMachine:
 class StationaryRobot:
     """Класс стационарного робота"""
     def __init__(self, detail=None):
+        self.sr_x = 200
+        self.sr_y = -200
+        self.turtle = moving.new_turtle(self.sr_x, self.sr_y, moving.stat_r_r)
         self.detail = detail
         self.__isReady = True
         pass
@@ -172,6 +188,12 @@ class StationaryRobot:
 class Machine:
     """Класс токарного/фрезерного станков"""
     def __init__(self):
+        self.tok_x = 100
+        self.tok_y = -200
+        self.turtle_t = moving.new_turtle(self.tok_x, self.tok_y, moving.tok_free)
+        self.fr_x = 300
+        self.fr_y = -200
+        self.turtle_f = moving.new_turtle(self.fr_x, self.fr_y, moving.frez_free)
         self.isReadyToAccept = True
         self.__isReady = True
         self.isReadyToMove = False
@@ -194,9 +216,12 @@ class Machine:
         """Обработка на токарном станке"""
         if self.__isReady:
             self.__isReady = False
+            self.turtle_t.change_shape(moving.tok_busy)
             print("Обработка")
+            time.sleep(2)
             print("Конец обработки")
             self.__isReady = True
+            self.turtle_t.change_shape(moving.tok_free)
             self.isReadyToIssue = True
         else:
             print("Токарный станок не готов")
@@ -205,8 +230,11 @@ class Machine:
         """Обработка на фрезерном станке"""
         if self.__isReady:
             self.__isReady = False
+            self.turtle_f.change_shape(moving.frez_busy)
             print("Фрезеровка")
+            time.sleep(2)
             print("Конец фрезеровки")
+            self.turtle_f.change_shape(moving.frez_free)
             self.__isReady = True
             self.isReadyToIssue = True
         else:
@@ -344,6 +372,7 @@ class Server:
 
     def P9(self):               # Отправка запроса на перемещение
         self.Machine.Move()
+
         self.P12()
 
     def P10(self):              # Готовность выдачи ТОК_ФРЕЗ
@@ -354,6 +383,10 @@ class Server:
 
     def P12(self):              # Прием сигнала о готовности выдачи с токарного станка
         self.StationaryRobot.Move(True, True)
+        if self.StationaryRobot.turtle.turtle.shape() == moving.stat_r_r:
+            self.StationaryRobot.turtle.change_shape(moving.stat_r_l)
+        else:
+            self.StationaryRobot.turtle.change_shape(moving.stat_r_r)
 
     def P13(self):              # Прием сигнала с фрезерного станка о готовности выдачи
         self.StationaryRobot.Removing(True)
@@ -424,6 +457,7 @@ if __name__ == "__main__":
         server.CuttingProcCycle(ag.name)
 
     server.TransportingProcCycle(server.Container.name, 'Отрезной станок', 'ТОК_ФРЕЗ станки')
+    mobilerobot.turtle.turtle.goto(cuttingmachine.cm_x, cuttingmachine.cm_x)
 
     print(server.Container.content)
     copy_cont = server.Container.content.copy()
@@ -431,3 +465,4 @@ if __name__ == "__main__":
         server.ProcessingProcCycle(det)
 
     server.TransportingProcCycle(server.Container.name, 'ТОК_ФРЕЗ станки', 'Цех сборки')
+    turtle.mainloop()
