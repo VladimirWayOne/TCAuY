@@ -7,6 +7,7 @@ import turtle
 
 from threading import Thread, active_count
 
+threads = []
 
 class addThread(Thread):
     def __init__(self, name, target):
@@ -510,8 +511,11 @@ if __name__ == "__main__":
 
         for ag in Agents1:
             server.CuttingProcCycle1(ag.name)
-        server.TransportingProcCycle1(server.Containers[0].name, 'Отрезной станок', 'ТОК_ФРЕЗ станки')
-        server.TransportingProcCycle2(server.Containers[1].name, '', 'Отрезной станок')
+        server.TransportingProcCycle1(server.Containers[0].name, 'Отрезной станок', 'ТОК_ФРЕЗ станки',)
+
+        server.TransportingProcCycle2(server.Containers[1].name, '', 'Отрезной станок',)
+        #thr1.join()
+        #thr2.join()
         #print(server.Container1.content)
         copy_cont1 = server.Containers[0].content.copy()
         for det in copy_cont1:
