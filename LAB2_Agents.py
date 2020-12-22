@@ -1,14 +1,15 @@
 import time
 from tqdm import tqdm
 
-import moving, turtle
+import moving
+import turtle
 
 
 class Agent:
     """Единый класс Агента"""
     def __init__(self, name):
         self.name = name
-        #print('Агент ' + self.name + ' готов')
+        # print('Агент ' + self.name + ' готов')
 
 
 class Storage:
@@ -24,8 +25,8 @@ class Storage:
 
     def Accept(self, thing):
         """Функция приемки на складе"""
-        isReadyToAccept = True  #готовность к приемке
-        isReadyToIssue = False  #готовность к выдаче
+        isReadyToAccept = True  # готовность к приемке
+        isReadyToIssue = False  # готовность к выдаче
         if self._current < self.maximum:
             self._current += 1
             self._storage.append(thing)
@@ -163,9 +164,9 @@ class StationaryRobot:
 
         if self.__isReady:
             self.__isReady = False
-           # print('Захват детали с фрезерного станка')
-            #print('Установка детали на токарный станок')
-            #print('Деталь установлена')
+            # print('Захват детали с фрезерного станка')
+            # print('Установка детали на токарный станок')
+            # print('Деталь установлена')
             self.__isReady = True
         else:
             print('Стационарный робот не готов')
@@ -178,7 +179,7 @@ class StationaryRobot:
 
         if self.__isReady:
             self.__isReady = False
-           # print("Захват детали с фрезерного станка")
+            # print("Захват детали с фрезерного станка")
         # print("Перемещение детали в тару")
             self.__isReady = True
         else:
@@ -362,10 +363,10 @@ class Server:
     def P7(self, detail):               # Готовность приема ТОК_ФРЕЗ
         self.Machine.Accept(detail)
 
-    def P8(self, machine):               # Обработка ТОК_ФРЕЗ
-        if machine == 'фрез':
+    def P8(self, current_machine):               # Обработка ТОК_ФРЕЗ
+        if current_machine == 'фрез':
             self.Machine.ProcessingFrez()
-        elif machine == 'ток':
+        elif current_machine == 'ток':
             self.Machine.ProcessingTok()
         else:
             print("Такого станка нет")
@@ -394,7 +395,7 @@ class Server:
     def P14(self, detail):      # Загрузить в тару
         self.Container.Accept(detail)
 
-    def P15(self,  what, from_where, to_where): # Транспортировка
+    def P15(self,  what, from_where, to_where):  # Транспортировка
         self.Container.Transporting()
         self.MobileRobot.transport(what, from_where, to_where)
 
