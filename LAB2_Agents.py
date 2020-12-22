@@ -60,39 +60,7 @@ class Storage:
                 print(thing, ': данного предмета/вещи нет')
 
 
-class MobileRobot1:
-    """Класс мобильного робота"""
-    def __init__(self):
-        self.__isReady = True    # готовность работы
-        self.mr_x = 0
-        self.mr_y = 0
-        self.turtle = moving.new_turtle(self.mr_x, self.mr_y, moving.robot)
-
-    def transport(self, what, from_where, to_where):
-        """Транспортировка"""
-        if self.__isReady:      # проверка на готовность
-            self.__isReady = False
-            print('Мобильный робот: Транспортировка ', what, ' из ', from_where, ' до ', to_where)
-            self.turtle.change_shape(moving.robot_busy)
-            if to_where == 'Отрезной станок':
-                self.turtle.turtle.goto(-100, -200)
-            elif to_where == 'ТОК_ФРЕЗ станки':
-                self.turtle.turtle.goto(200, -100)
-            elif to_where == 'Цех сборки':
-                self.turtle.turtle.goto(200, 400)
-            elif to_where == '':
-                self.turtle.turtle.goto(0, 0)
-
-            for i in tqdm(range(0, 10)):
-                time.sleep(0.01)
-
-            print('\nПередача завершена')
-            self.turtle.change_shape(moving.robot)
-            self.__isReady = True
-        else:
-            print('Мобильный робот занят')
-
-class MobileRobot2:
+class MobileRobot:
     """Класс мобильного робота"""
     def __init__(self):
         self.__isReady = True    # готовность работы
@@ -312,7 +280,7 @@ class Machine:
             print('Станок не готов к выдаче')
 
 
-class Container1:
+class Container:
     """Тара для заготовок и готовых изделий"""
     def __init__(self, maximum=10, name='Тара_1'):
         self.maximum = maximum      # Максимальное количество содержимого в таре (по умолчанию 10)
@@ -381,89 +349,20 @@ class Container1:
         else:
             print("Тара не готова к выдаче")
 
-class Container2:
-    """Тара для заготовок и готовых изделий"""
-    def __init__(self, maximum=10, name='Тара_2'):
-        self.maximum = maximum      # Максимальное количество содержимого в таре (по умолчанию 10)
-        self.isReadyToAccept = True
-        self.__isReadyToTransport = False
-        self.content = []
-        self.isReadyToIssue = False
-        self.name = name
-        pass
-
-    def __isFull(self):
-        """Приватный метод класса для проверки заполненности тары"""
-        if len(self.content) == self.maximum:
-            self.isReadyToIssue = True
-            return True
-        else:
-            return False
-
-    def __isEmpty(self):
-        """Приватный метод класса для опустошенности тары"""
-        if len(self.content) == 0:
-            self.isReadyToIssue = False
-            self.isReadyToAccept = True
-            return True
-        else:
-            return False
-
-    def Accept(self, detail):
-        """Прием промежуточных заготовок и готовых деталей"""
-        if self.__isFull():
-            print('Тара переполненна')
-            self.isReadyToAccept = False
-        else:
-            if self.isReadyToAccept:
-                self.isReadyToAccept = False
-                print("В процессе загрузки")
-                self.content.append(detail)
-                print('В', self.name, len(self.content), 'деталей')  # Заполненность
-                self.__isReadyToTransport = True
-                print("Готово к транспортировке")
-                self.isReadyToIssue = True
-                self.isReadyToAccept = True
-            else:
-                print("Тара не готова к приемке")
-
-    def Transporting(self):
-        """Перемещение тары посредством Мобильного робота"""
-        if self.__isReadyToTransport:
-            print("К транспортировке готово")
-
-    def Issue(self, detail):
-        """Выдача прутков на последующую обработку"""
-        if self.__isEmpty():        # Проверка на пустоту
-            print('Тара пуста')
-            return 0
-
-        if self.isReadyToIssue:          # Проверка на готовность к выдаче
-            if detail in self.content:
-                print('Выдача')
-                self.content.remove(detail)
-                self.isReadyToAccept = True
-                if self.__isEmpty():    # Сообщение об опустошении
-                    print('Тара пуста')
-            else:
-                print('Данной детали нет')
-        else:
-            print("Тара не готова к выдаче")
 
 class Server:
     """
     Сервер, с помощью которого производится управление системой
     """
-    def __init__(self, Agent, Storage, MobileRobot1, MobileRobot2, CuttingMachine, StationaryRobot, Machine, Container1, Container2):
+    def __init__(self, Agent, Storage, MobileRobots, CuttingMachine, StationaryRobot, Machine, Containers):
         self.Agent = Agent
         self.Storage = Storage
-        self.MobileRobot1 = MobileRobot1
-        self.MobileRobot2 = MobileRobot2
+        self.MobileRobots = MobileRobots
         self.CuttingMachine = CuttingMachine
         self.StationaryRobot = StationaryRobot
         self.Machine = Machine
-        self.Container1 = Container1
-        self.Container2 = Container2
+        self.Containers = Containers
+
 
     def P1(self, detail):   # Приемка на складе
         if self.Storage.isReadyToAccept:
@@ -478,10 +377,10 @@ class Server:
             print('Error!')
 
     def P3(self, what, from_where, to_where):   # Готовность транспортировки
-        self.MobileRobot1(what, from_where, to_where)
+        self.MobileRobots[0](what, from_where, to_where)
 
     def P4(self, what, from_where, to_where):   # Готовность транспортировки
-        self.MobileRobot2(what, from_where, to_where)
+        self.MobileRobots[1](what, from_where, to_where)
 
     def P5(self, detail):       # Готовность приемa
         self.CuttingMachine.Accept(detail)
@@ -520,24 +419,24 @@ class Server:
         self.StationaryRobot.Removing(True)
 
     def P15(self, detail):      # Загрузить в тару
-        self.Container1.Accept(detail)
+        self.Containers[0].Accept(detail)
 
     def P16(self, detail):      # Загрузить в тару
-        self.Container2.Accept(detail)
+        self.Containers[1].Accept(detail)
 
     def P17(self,  what, from_where, to_where):  # Транспортировка
-        self.Container1.Transporting()
-        self.MobileRobot1.transport(what, from_where, to_where)
+        self.Containers[0].Transporting()
+        self.MobileRobots[0].transport(what, from_where, to_where)
 
     def P18(self,  what, from_where, to_where):  # Транспортировка
-        self.Container2.Transporting()
-        self.MobileRobot2.transport(what, from_where, to_where)
+        self.Containers[1].Transporting()
+        self.MobileRobots[1].transport(what, from_where, to_where)
 
     def P19(self, detail):                      # Выдача из контейнера
-        self.Container1.Issue(detail)
+        self.Containers[0].Issue(detail)
 
     def P20(self, detail):                      # Выдача из контейнера
-        self.Container2.Issue(detail)
+        self.Containers[1].Issue(detail)
 
     def CuttingProcCycle1(self, detail):
         """Цикл резки"""
@@ -602,27 +501,27 @@ if __name__ == "__main__":
         cuttingmachine = CuttingMachine()
         statrobot = StationaryRobot()
         machine = Machine()
-        contain1 = Container1()
-        contain2 = Container2()
-        mobilerobot1 = MobileRobot1()
-        mobilerobot2 = MobileRobot2()
-        server = Server(agent, storage, mobilerobot1, mobilerobot2, cuttingmachine, statrobot, machine, contain1, contain2)
-        server.TransportingProcCycle1(server.Container1.name, '', 'Отрезной станок')
+        contain1 = Container(name="Контейнер1")
+        contain2 = Container(name="Контейнер2")
+        mobilerobot1 = MobileRobot()
+        mobilerobot2 = MobileRobot()
+        server = Server(agent, storage, [mobilerobot1, mobilerobot2], cuttingmachine, statrobot, machine, [contain1, contain2])
+        server.TransportingProcCycle1(server.Containers[0].name, '', 'Отрезной станок')
 
         for ag in Agents1:
             server.CuttingProcCycle1(ag.name)
-        server.TransportingProcCycle1(server.Container1.name, 'Отрезной станок', 'ТОК_ФРЕЗ станки')
-        server.TransportingProcCycle2(server.Container2.name, '', 'Отрезной станок')
+        server.TransportingProcCycle1(server.Containers[0].name, 'Отрезной станок', 'ТОК_ФРЕЗ станки')
+        server.TransportingProcCycle2(server.Containers[1].name, '', 'Отрезной станок')
         #print(server.Container1.content)
-        copy_cont1 = server.Container1.content.copy()
+        copy_cont1 = server.Containers[0].content.copy()
         for det in copy_cont1:
             server.ProcessingProcCycle1(det)
         for ag in Agents2:
             server.CuttingProcCycle2(ag.name)
-        server.TransportingProcCycle1(server.Container1.name, 'ТОК_ФРЕЗ станки', 'Цех сборки')
-        server.TransportingProcCycle2(server.Container2.name, 'Отрезной станок', 'ТОК_ФРЕЗ станки')
+        server.TransportingProcCycle1(server.Containers[0].name, 'ТОК_ФРЕЗ станки', 'Цех сборки')
+        server.TransportingProcCycle2(server.Containers[1].name, 'Отрезной станок', 'ТОК_ФРЕЗ станки')
 
-        copy_cont2 = server.Container2.content.copy()
+        copy_cont2 = server.Containers[1].content.copy()
         for det in copy_cont2:
             server.ProcessingProcCycle2(det)
-        server.TransportingProcCycle2(server.Container2.name, 'ТОК_ФРЕЗ станки', 'Цех сборки')
+        server.TransportingProcCycle2(server.Containers[1].name, 'ТОК_ФРЕЗ станки', 'Цех сборки')
