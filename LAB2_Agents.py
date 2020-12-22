@@ -61,11 +61,21 @@ class MobileRobot:
         if self.__isReady:      # проверка на готовность
             self.__isReady = False
             print('Мобильный робот: Транспортировка ', what, ' из ', from_where, ' до ', to_where)
+            self.turtle.change_shape(moving.robot_busy)
+            if to_where == 'Отрезной станок':
+                self.turtle.turtle.goto(-200, -200)
+            elif to_where == 'ТОК_ФРЕЗ станки':
+                self.turtle.turtle.goto(200, -200)
+            elif to_where == 'Цех сборки':
+                self.turtle.turtle.goto(200, 200)
+            elif to_where == '':
+                self.turtle.turtle.goto(0, 0)
+
             for i in tqdm(range(0, 10)):
                 time.sleep(0.01)
 
             print('\nПередача завершена')
-
+            self.turtle.change_shape(moving.robot)
             self.__isReady = True
         else:
             print('Мобильный робот занят')
@@ -448,11 +458,11 @@ if __name__ == "__main__":
     # details = ['det1', 'det2', 'det3']
     agent = Agent('test')
     storage = Storage()
-    mobilerobot = MobileRobot()
     cuttingmachine = CuttingMachine()
     statrobot = StationaryRobot()
     machine = Machine()
     contain = Container()
+    mobilerobot = MobileRobot()
     server = Server(agent, storage, mobilerobot, cuttingmachine, statrobot, machine, contain)
     for ag in Agents:
         server.CuttingProcCycle(ag.name)
