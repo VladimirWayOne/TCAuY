@@ -4,7 +4,18 @@ from tqdm import tqdm
 import moving
 import turtle
 
-import threading
+from threading import Thread
+
+
+class addThread(Thread):
+    def __init__(self, name, target):
+        Thread.__init__(self, target=target)
+
+        self.name = name
+
+    def start_thread(self):
+        self.start()
+
 
 class Agent:
     """Единый класс Агента"""
