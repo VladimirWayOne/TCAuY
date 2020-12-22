@@ -4,6 +4,7 @@ from tqdm import tqdm
 import moving
 import turtle
 
+import threading
 
 class Agent:
     """Единый класс Агента"""
