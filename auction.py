@@ -18,7 +18,9 @@ class Lot:
 
 
 class Auction:
-    def __init__(self, initial_rate=1, step=1):
+    def __init__(self, Lot, Participants, initial_rate=1, step=1):
+        self.Lot = Lot
+        self.Participants = Participants    # список участников
         self.initial_rate = initial_rate    # начальная ставка
         self.step = step                # шаг
         self.current_winner = None      # текущий победитель
@@ -32,3 +34,11 @@ class Auction:
 
         print(self.current_winner.name)
         return self.current_winner
+
+
+if __name__ == "__main__":
+    zakaz = Lot("Доставка до склада", 1)
+    auct1 = Auctioneer("Мобильный робот 1", 100)
+    auct2 = Auctioneer("Мобильный робот 2", 50)
+    auct3 = Auctioneer("Мобильный робот 3", 25)
+    pass
